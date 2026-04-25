@@ -54,7 +54,7 @@ export function TrainScreen({ addSession }: { addSession: (session: TrainingSess
             <View style={styles.exerciseNumber}>
               <Text style={styles.exerciseNumberText}>{index + 1}</Text>
             </View>
-            <View style={{ flex: 1 }}>
+            <View style={styles.exerciseCopy}>
               <Text style={styles.exerciseName}>{name}</Text>
               <Text style={styles.muted}>{dose}</Text>
             </View>
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   muted: { color: colours.muted, fontSize: 13 },
   title: { color: colours.text, fontSize: 32, fontWeight: '900', marginBottom: 16 },
   grid: { flexDirection: 'row', gap: 12 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, gap: 12 },
   cardTitle: { color: colours.text, fontSize: 19, fontWeight: '900' },
   badge: { color: colours.cyan, fontSize: 12, backgroundColor: 'rgba(103,232,249,0.10)', padding: 8, borderRadius: 999 },
   exerciseRow: {
@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   exerciseNumberText: { color: colours.cyan, fontWeight: '900' },
+  exerciseCopy: { flex: 1 },
   exerciseName: { color: colours.text, fontWeight: '800' },
   coach: { color: colours.text, fontSize: 14, lineHeight: 21 },
   primaryButton: {

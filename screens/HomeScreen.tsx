@@ -22,14 +22,14 @@ export function HomeScreen({
   return (
     <Screen>
       <Text style={styles.muted}>Morning, Leo</Text>
-      <Text style={styles.title}>Today’s Mission</Text>
+      <Text style={styles.title}>Today's Mission</Text>
 
       <Card>
         <View style={styles.readinessRow}>
           <View>
             <Text style={styles.muted}>Readiness Score</Text>
             <Text style={styles.bigNumber}>{readiness}</Text>
-            <Text style={styles.good}>Green — train as planned</Text>
+            <Text style={styles.good}>Green - train as planned</Text>
           </View>
           <View style={styles.circle}>
             <Ionicons name="speedometer" size={46} color={colours.cyan} />
@@ -41,7 +41,7 @@ export function HomeScreen({
       <Card style={{ backgroundColor: colours.panel }}>
         <Text style={styles.eyebrow}>ASSIGNED</Text>
         <Text style={styles.cardTitle}>Ruck Intervals</Text>
-        <Text style={styles.muted}>45 mins · 18kg · mixed terrain</Text>
+        <Text style={styles.muted}>45 mins - 18kg - mixed terrain</Text>
         <Pressable style={styles.primaryButton} onPress={goToRuck}>
           <Text style={styles.primaryButtonText}>Start Ruck</Text>
         </Pressable>
@@ -61,10 +61,10 @@ export function HomeScreen({
 
       {sessions.slice(0, 3).map((session) => (
         <View key={session.id} style={styles.sessionRow}>
-          <View>
+          <View style={styles.sessionCopy}>
             <Text style={styles.sessionTitle}>{session.title}</Text>
             <Text style={styles.mutedSmall}>
-              {session.type} · {session.durationMinutes} mins · RPE {session.rpe}
+              {session.type} - {session.durationMinutes} mins - RPE {session.rpe}
             </Text>
           </View>
           <View>
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   title: { color: colours.text, fontSize: 32, fontWeight: '900', marginBottom: 16 },
   bigNumber: { color: colours.text, fontSize: 62, fontWeight: '900' },
   good: { color: colours.cyan, fontSize: 14, marginBottom: 16 },
-  readinessRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  readinessRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 18 },
   circle: {
     height: 110,
     width: 110,
@@ -118,6 +118,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.05)',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 14,
+  },
+  sessionCopy: {
+    flex: 1,
   },
   sessionTitle: { color: colours.text, fontWeight: '800' },
   score: { color: colours.cyan, fontSize: 20, fontWeight: '900', textAlign: 'right' },

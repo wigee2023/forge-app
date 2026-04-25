@@ -15,7 +15,7 @@ export function MetricCard({ icon, label, value, sub, tone = colours.cyan }: Pro
   return (
     <View style={styles.card}>
       <View style={styles.row}>
-        <View>
+        <View style={styles.copy}>
           <Text style={styles.label}>{label}</Text>
           <Text style={styles.value}>{value}</Text>
           <Text style={styles.sub}>{sub}</Text>
@@ -40,6 +40,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 10,
+  },
+  copy: {
+    flex: 1,
   },
   label: {
     color: colours.muted,
