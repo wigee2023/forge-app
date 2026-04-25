@@ -5,7 +5,7 @@ import { Screen } from '../components/Screen';
 import { Card } from '../components/Card';
 import { MetricCard } from '../components/MetricCard';
 import { ProgressBar } from '../components/ProgressBar';
-import { colours } from '../theme';
+import { colours, shadow } from '../theme';
 import { TrainingSession } from '../data/mockData';
 
 export function HomeScreen({
@@ -18,58 +18,91 @@ export function HomeScreen({
   goToAnalytics: () => void;
 }) {
   const readiness = 82;
+  const statusColour = readiness >= 80 ? colours.green : readiness >= 60 ? colours.amber : colours.red;
+  const statusLabel  = readiness >= 80 ? 'GREEN — Train as planned' : readiness >= 60 ? 'AMBER — Monitor load' : 'RED — Rest advised';
 
   return (
     <Screen>
-      <Text style={styles.muted}>Morning, Leo</Text>
-      <Text style={styles.title}>Today's Mission</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.callsign}>// FORGE</Text>
+          <Text style={styles.pageTitle}>Today's Mission</Text>
+        </View>
+        <View style={[styles.statusBadge, { borderColor: `${statusColour}55`, backgroundColor: `${statusColour}12` }]}>
+          <View style={[styles.statusDot, { backgroundColor: statusColour }]} />
+          <Text style={[styles.statusText, { color: statusColour }]}>
+            {readiness >= 80 ? 'GREEN' : readiness >= 60 ? 'AMBER' : 'RED'}
+          </Text>
+        </View>
+      </View>
 
-      <Card>
+      {/* Readiness card */}
+      <Card hot>
         <View style={styles.readinessRow}>
-          <View>
-            <Text style={styles.muted}>Readiness Score</Text>
-            <Text style={styles.bigNumber}>{readiness}</Text>
-            <Text style={styles.good}>Green - train as planned</Text>
+          <View style={styles.readinessCopy}>
+            <Text style={styles.metaLabel}>READINESS SCORE</Text>
+            <Text style={[styles.bigNumber, { color: statusColour }]}>{readiness}</Text>
+            <Text style={[styles.statusLine, { color: statusColour }]}>{statusLabel}</Text>
           </View>
-          <View style={styles.circle}>
-            <Ionicons name="speedometer" size={46} color={colours.cyan} />
+          <View style={[styles.circle, { borderColor: `${statusColour}35`, backgroundColor: `${statusColour}10` }]}>
+            <Ionicons name="speedometer" size={40} color={statusColour} />
           </View>
         </View>
-        <ProgressBar value={readiness} />
+        <ProgressBar value={readiness} colour={statusColour} />
       </Card>
 
-      <Card style={{ backgroundColor: colours.panel }}>
+      {/* Today's workout card */}
+      <Card accent={colours.amber}>
         <Text style={styles.eyebrow}>ASSIGNED</Text>
         <Text style={styles.cardTitle}>Ruck Intervals</Text>
-        <Text style={styles.muted}>45 mins - 18kg - mixed terrain</Text>
-        <Pressable style={styles.primaryButton} onPress={goToRuck}>
-          <Text style={styles.primaryButtonText}>Start Ruck</Text>
+        <Text style={styles.cardMeta}>45 min · 18 kg · Mixed terrain</Text>
+        <View style={styles.workoutTags}>
+          <View style={[styles.tag, { borderColor: `${colours.amber}40`, backgroundColor: colours.amberDim }]}>
+            <Text style={[styles.tagText, { color: colours.amber }]}>RUCK</Text>
+          </View>
+          <View style={[styles.tag, { borderColor: `${colours.cyan}40`, backgroundColor: colours.cyanDim }]}>
+            <Text style={[styles.tagText, { color: colours.cyan }]}>LOADED</Text>
+          </View>
+          <View style={[styles.tag, { borderColor: `${colours.red}40`, backgroundColor: colours.redDim }]}>
+            <Text style={[styles.tagText, { color: colours.red }]}>RPE 7</Text>
+          </View>
+        </View>
+        <Pressable style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.80 }]} onPress={goToRuck}>
+          <Ionicons name="play-circle" size={18} color={colours.background} />
+          <Text style={styles.primaryButtonText}>Start Session</Text>
         </Pressable>
       </Card>
 
+      {/* Metrics grid */}
       <View style={styles.grid}>
-        <MetricCard icon="pulse" label="Weekly Load" value="486" sub="+8% this week" />
-        <MetricCard icon="flame" label="Recovery" value="Good" sub="Sleep stable" tone={colours.amber} />
+        <MetricCard icon="pulse"  label="Weekly Load" value="486" sub="+8% vs last week" tone={colours.cyan} />
+        <MetricCard icon="flame"  label="Recovery"    value="Good" sub="Sleep stable"    tone={colours.green} />
       </View>
 
+      {/* Recent sessions */}
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Recent Sessions</Text>
-        <Pressable onPress={goToAnalytics}>
-          <Text style={styles.link}>View all</Text>
+        <Pressable onPress={goToAnalytics} style={styles.viewAllBtn}>
+          <Text style={styles.viewAllText}>View all</Text>
+          <Ionicons name="chevron-forward" size={13} color={colours.cyan} />
         </Pressable>
       </View>
 
       {sessions.slice(0, 3).map((session) => (
-        <View key={session.id} style={styles.sessionRow}>
+        <View key={session.id} style={[styles.sessionRow, shadow.subtle]}>
+          <View style={[styles.sessionIconWrap, { backgroundColor: colours.cyanDim, borderColor: colours.border }]}>
+            <Ionicons name="barbell-outline" size={18} color={colours.cyan} />
+          </View>
           <View style={styles.sessionCopy}>
             <Text style={styles.sessionTitle}>{session.title}</Text>
-            <Text style={styles.mutedSmall}>
-              {session.type} - {session.durationMinutes} mins - RPE {session.rpe}
+            <Text style={styles.sessionMeta}>
+              {session.type} · {session.durationMinutes} min · RPE {session.rpe}
             </Text>
           </View>
-          <View>
+          <View style={styles.sessionRight}>
             <Text style={styles.score}>{session.score}</Text>
-            <Text style={styles.mutedTiny}>score</Text>
+            <Text style={styles.scoreLabel}>SCORE</Text>
           </View>
         </View>
       ))}
@@ -78,51 +111,207 @@ export function HomeScreen({
 }
 
 const styles = StyleSheet.create({
-  muted: { color: colours.muted, fontSize: 14 },
-  mutedSmall: { color: colours.muted, fontSize: 12 },
-  mutedTiny: { color: colours.muted, fontSize: 10, textAlign: 'right' },
-  title: { color: colours.text, fontSize: 32, fontWeight: '900', marginBottom: 16 },
-  bigNumber: { color: colours.text, fontSize: 62, fontWeight: '900' },
-  good: { color: colours.cyan, fontSize: 14, marginBottom: 16 },
-  readinessRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 18 },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  callsign: {
+    color: colours.muted,
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 2.5,
+    marginBottom: 3,
+  },
+  pageTitle: {
+    color: colours.text,
+    fontSize: 30,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginTop: 4,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+  },
+
+  /* Readiness */
+  readinessRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 16,
+  },
+  readinessCopy: { flex: 1 },
+  metaLabel: {
+    color: colours.muted,
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+    marginBottom: 4,
+  },
+  bigNumber: {
+    fontSize: 64,
+    fontWeight: '900',
+    lineHeight: 68,
+  },
+  statusLine: {
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.4,
+    marginTop: 2,
+  },
   circle: {
-    height: 110,
-    width: 110,
-    borderRadius: 55,
-    borderColor: 'rgba(103,232,249,0.3)',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(103,232,249,0.09)',
   },
-  eyebrow: { color: colours.amber, letterSpacing: 3, fontSize: 11, fontWeight: '800' },
-  cardTitle: { color: colours.text, fontSize: 22, fontWeight: '800', marginTop: 6 },
-  primaryButton: {
-    marginTop: 16,
-    backgroundColor: colours.cyan,
-    borderRadius: 18,
-    paddingVertical: 13,
-    alignItems: 'center',
+
+  /* Today's workout */
+  eyebrow: {
+    color: colours.amber,
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 2.5,
+    marginBottom: 5,
   },
-  primaryButtonText: { color: '#07111E', fontWeight: '900' },
-  grid: { flexDirection: 'row', gap: 12 },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  sectionTitle: { color: colours.text, fontSize: 18, fontWeight: '800' },
-  link: { color: colours.cyan, fontSize: 13 },
-  sessionRow: {
-    borderColor: colours.border,
-    borderWidth: 1,
-    borderRadius: 22,
-    padding: 14,
+  cardTitle: {
+    color: colours.text,
+    fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: -0.3,
+  },
+  cardMeta: {
+    color: colours.muted,
+    fontSize: 13,
+    marginTop: 3,
     marginBottom: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  workoutTags: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 14,
+  },
+  tag: {
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  tagText: {
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+  },
+  primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colours.cyan,
+    borderRadius: 16,
+    paddingVertical: 13,
+    shadowColor: colours.cyan,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 8,
+  },
+  primaryButtonText: {
+    color: colours.background,
+    fontWeight: '900',
+    fontSize: 15,
+    letterSpacing: 0.3,
+  },
+
+  /* Metrics */
+  grid: { flexDirection: 'row', gap: 12 },
+
+  /* Section header */
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 14,
+    alignItems: 'center',
+    marginBottom: 2,
   },
-  sessionCopy: {
-    flex: 1,
+  sectionTitle: {
+    color: colours.text,
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 0.2,
   },
-  sessionTitle: { color: colours.text, fontWeight: '800' },
-  score: { color: colours.cyan, fontSize: 20, fontWeight: '900', textAlign: 'right' },
+  viewAllBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  viewAllText: {
+    color: colours.cyan,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+
+  /* Session rows */
+  sessionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 1,
+    borderColor: colours.borderSoft,
+    borderRadius: 16,
+    padding: 12,
+    backgroundColor: 'rgba(10, 20, 35, 0.70)',
+  },
+  sessionIconWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  sessionCopy: { flex: 1 },
+  sessionTitle: {
+    color: colours.text,
+    fontWeight: '800',
+    fontSize: 13,
+  },
+  sessionMeta: {
+    color: colours.muted,
+    fontSize: 11,
+    marginTop: 2,
+  },
+  sessionRight: { alignItems: 'flex-end' },
+  score: {
+    color: colours.cyan,
+    fontSize: 20,
+    fontWeight: '900',
+  },
+  scoreLabel: {
+    color: colours.soft,
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+    marginTop: 1,
+  },
 });
