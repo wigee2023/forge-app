@@ -6,10 +6,13 @@ import { AnalyticsScreen } from './screens/AnalyticsScreen';
 import { RuckScreen } from './screens/RuckScreen';
 import { TrainScreen } from './screens/TrainScreen';
 import { InstructorScreen } from './screens/InstructorScreen';
+import { EnvironmentScreen } from './screens/EnvironmentScreen';
+import { CognitiveScreen } from './screens/CognitiveScreen';
 import { initialSessions, TrainingSession } from './data/mockData';
+import { useStorage } from './hooks/useStorage';
 import { colours } from './theme';
 
-type Tab = 'home' | 'train' | 'ruck' | 'analytics' | 'instructor';
+type Tab = 'home' | 'train' | 'ruck' | 'analytics' | 'instructor' | 'environment' | 'cognitive';
 
 const tabs: Array<{ id: Tab; label: string; icon: keyof typeof Ionicons.glyphMap }> = [
   { id: 'home', label: 'Home', icon: 'home' },
@@ -17,11 +20,16 @@ const tabs: Array<{ id: Tab; label: string; icon: keyof typeof Ionicons.glyphMap
   { id: 'ruck', label: 'Ruck', icon: 'footsteps' },
   { id: 'analytics', label: 'Intel', icon: 'analytics' },
   { id: 'instructor', label: 'Coach', icon: 'people' },
+  { id: 'environment', label: 'Mission', icon: 'earth' },
+  { id: 'cognitive', label: 'Mind', icon: 'pulse' },
 ];
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('home');
-  const [sessions, setSessions] = useState<TrainingSession[]>(initialSessions);
+  const [sessions, setSessions, sessionsLoaded] = useStorage<TrainingSession[]>(
+    'forge:sessions',
+    initialSessions,
+  );
 
   function addSession(session: TrainingSession) {
     setSessions((current) => [session, ...current]);
@@ -37,6 +45,10 @@ export default function App() {
         return <AnalyticsScreen sessions={sessions} />;
       case 'instructor':
         return <InstructorScreen />;
+      case 'environment':
+        return <EnvironmentScreen />;
+      case 'cognitive':
+        return <CognitiveScreen />;
       default:
         return (
           <HomeScreen
@@ -46,6 +58,10 @@ export default function App() {
           />
         );
     }
+  }
+
+  if (!sessionsLoaded) {
+    return <View style={styles.app} />;
   }
 
   return (
@@ -87,7 +103,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#101827',
   },
   tabButton: {
-    width: '20%',
+    flex: 1,
     minHeight: 54,
     alignItems: 'center',
     justifyContent: 'center',
@@ -95,7 +111,7 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     color: colours.muted,
-    fontSize: 11,
+    fontSize: 9,
     fontWeight: '700',
   },
   activeTabLabel: {
